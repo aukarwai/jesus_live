@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<title>JESUS · 1000PEPE cockpit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0E13; --panel:#141922; --panel2:#1B222D; --line:#26303D;
+  --txt:#E8ECF2; --mut:#7E8A9A; --dim:#566374;
+  --hot:#FF5A36; --hot2:#FFB020;        /* AGGRESSIVE channel */
+  --cool:#5BD1C4; --cool2:#3FA9C9;      /* HONEST channel */
+  --up:#3DDC84; --dn:#FF5A6E;
+  --lowc:#566374; --medc:#FFB020; --highc:#3DDC84;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--ink);color:var(--txt);
+  font-family:"Space Grotesk",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 16px) env(safe-area-inset-left);
+  max-width:520px;margin:0 auto;font-size:15px;line-height:1.35}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{padding:10px 12px 0}
+/* top bar */
+.top{display:flex;align-items:center;gap:8px;padding:6px 2px 10px}
+.mark{font-weight:700;letter-spacing:.14em;font-size:15px}
+.mark b{color:var(--hot)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim);box-shadow:0 0 0 0 rgba(61,220,132,.5)}
+.dot.live{background:var(--up);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,220,132,.45)}70%{box-shadow:0 0 0 7px rgba(61,220,132,0)}100%{box-shadow:0 0 0 0 rgba(61,220,132,0)}}
+.src{color:var(--mut);font-size:11.5px;letter-spacing:.04em}
+.clock{margin-left:auto;color:var(--mut);font-size:12.5px}
+/* honest banner */
+.banner{background:linear-gradient(90deg,rgba(91,209,196,.10),rgba(91,209,196,.02));
+  border:1px solid rgba(91,209,196,.22);border-radius:10px;padding:8px 11px;margin:0 0 12px;
+  font-size:11.5px;color:#A9E6DD;letter-spacing:.01em}
+.banner b{color:var(--cool)}
+/* hero */
+.hero{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-bottom:12px}
+.price{font-size:40px;font-weight:700;letter-spacing:-.01em;line-height:1}
+.price .tick{font-size:18px;margin-left:8px;vertical-align:middle}
+.subrow{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:var(--mut);font-size:12px}
+.range{margin-top:10px;height:6px;border-radius:4px;background:#0c1118;position:relative;overflow:hidden;border:1px solid var(--line)}
+.range .fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--dn),var(--medc),var(--up));opacity:.25;width:100%}
+.range .pin{position:absolute;top:-3px;width:3px;height:12px;background:#fff;border-radius:2px;transform:translateX(-50%)}
+/* now / weather */
+.now{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.cell{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.cell .lab{font-size:10.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+.cell .val{font-size:19px;font-weight:600;margin-top:3px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.02em}
+.gauge{margin-top:8px;height:7px;border-radius:5px;background:#0c1118;border:1px solid var(--line);position:relative;overflow:hidden}
+.gauge .g{position:absolute;left:0;top:0;bottom:0;border-radius:5px;background:linear-gradient(90deg,var(--cool2),var(--cool))}
+.gauge .base{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--mut);opacity:.7}
+.span2{grid-column:1 / -1}
+/* channels */
+.chan{border-radius:16px;padding:14px 15px;margin-bottom:12px;border:1px solid}
+.chan .htag{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.22em;font-weight:700;text-transform:uppercase;margin-bottom:9px}
+.chan .htag .ln{flex:1;height:1px}
+.aggr{background:linear-gradient(180deg,rgba(255,90,54,.09),rgba(255,90,54,.02));border-color:rgba(255,90,54,.30)}
+.aggr .htag{color:var(--hot)} .aggr .htag .ln{background:linear-gradient(90deg,rgba(255,90,54,.5),transparent)}
+.hon{background:linear-gradient(180deg,rgba(91,209,196,.08),rgba(91,209,196,.02));border-color:rgba(91,209,196,.28)}
+.hon .htag{color:var(--cool)} .hon .htag .ln{background:linear-gradient(90deg,rgba(91,209,196,.5),transparent)}
+.action{font-size:26px;font-weight:700;letter-spacing:.01em;display:flex;align-items:center;gap:10px}
+.arrow{font-size:24px}
+.long{color:var(--up)} .short{color:var(--dn)} .wait{color:var(--hot2)} .stand{color:var(--mut)}
+.kv{display:flex;justify-content:space-between;gap:10px;margin-top:7px;font-size:13px}
+.kv .k{color:var(--mut)} .kv .v{font-weight:600;text-align:right}
+.big-honest{font-size:21px;font-weight:700;margin:2px 0 2px}
+.verdict{margin-top:9px;padding:8px 10px;border-radius:9px;font-size:12.5px;font-weight:600;letter-spacing:.01em}
+.v-bad{background:rgba(255,90,110,.12);border:1px solid rgba(255,90,110,.3);color:#ffb3bf}
+.v-stand{background:rgba(86,99,116,.16);border:1px solid rgba(86,99,116,.4);color:#b6c2d1}
+/* mini table */
+.t3{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:12px}
+.t3 .hd{font-size:10.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-bottom:8px}
+.t3row{display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--line);font-size:13px}
+.t3row:first-of-type{border-top:none}
+.t3row .rg{font-weight:600} .t3row.cur{background:rgba(91,209,196,.06);border-radius:8px;margin:0 -6px;padding:6px}
+.seg{display:flex;gap:6px;margin-top:10px}
+.seg button{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--mut);
+  padding:8px 0;border-radius:9px;font-family:inherit;font-weight:600;font-size:13px}
+.seg button.on{background:rgba(91,209,196,.14);border-color:var(--cool);color:var(--cool)}
+/* log */
+.log{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 13px;margin-bottom:12px}
+.log .hd{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-bottom:8px}
+.log .row{font-size:12.5px;padding:3px 0;color:var(--txt);border-top:1px solid #1d2530}
+.log .row:first-child{border-top:none}
+.log .t{color:var(--dim);margin-right:8px}
+.c-x{color:var(--dn)} .c-h{color:var(--hot2)} .c-g{color:var(--up)} .c-t{color:var(--mut)}
+/* footer */
+.foot{color:var(--dim);font-size:11px;line-height:1.5;padding:4px 4px 12px;border-top:1px solid var(--line);margin-top:4px}
+.foot b{color:var(--mut)}
+.warmup{text-align:center;color:var(--mut);font-size:13px;padding:18px}
+.flag{font-size:10.5px;color:var(--hot2);margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span class="mark"><b>JE</b>SUS</span>
+    <span class="dot" id="dot"></span>
+    <span class="src" id="src">connecting…</span>
+    <span class="clock mono" id="clock">--:--</span>
+  </div>
+
+  <div class="banner">
+    <b>Timing &amp; discipline instrument — not a profit oracle.</b> Direction ≈ coin flip.
+    Best-case net edge after fees ≈ breakeven/negative (validated out-of-sample). Use it to time and to stand down.
+  </div>
+
+  <div class="hero">
+    <div><span class="price mono" id="px">0.000000</span><span class="tick mono" id="tick"></span></div>
+    <div class="subrow">
+      <span>1000PEPEUSDT · perp</span>
+      <span id="chg1h" class="mono">1h —</span>
+    </div>
+    <div class="range"><div class="fill"></div><div class="pin" id="pin" style="left:50%"></div></div>
+    <div class="subrow"><span class="mono" id="lo24">24h L —</span><span class="mono" id="hi24">24h H —</span></div>
+  </div>
+
+  <div id="live" style="display:none">
+    <div class="now">
+      <div class="cell"><div class="lab">Regime</div><div class="val"><span class="pill" id="regime">—</span></div>
+        <div style="font-size:11px;color:var(--mut);margin-top:6px" id="regimeNote">market activity</div></div>
+      <div class="cell"><div class="lab">State</div><div class="val"><span class="pill" id="state">—</span></div>
+        <div style="font-size:11px;color:var(--mut);margin-top:6px" id="stateNote">move lifecycle</div></div>
+      <div class="cell span2"><div class="lab">Onset — chance a move begins ≤30 min</div>
+        <div class="val mono" id="onsetPct" style="margin-top:4px">—</div>
+        <div class="gauge"><div class="g" id="onsetG" style="width:0%"></div><div class="base" style="left:17%"></div></div>
+        <div style="font-size:10.5px;color:var(--dim);margin-top:5px">marker = typical base rate (17%)</div></div>
+    </div>
+
+    <!-- AGGRESSIVE -->
+    <div class="chan aggr">
+      <div class="htag"><span>⚡ Aggressive</span><span class="ln"></span><span id="aggrMode" style="font-size:10px;letter-spacing:.1em;color:var(--hot2)">high-risk posture</span></div>
+      <div class="action" id="aAction"><span class="arrow" id="aArrow"></span><span id="aText">—</span></div>
+      <div class="kv"><span class="k">Trigger</span><span class="v" id="aWhy">—</span></div>
+      <div class="kv"><span class="k">Target</span><span class="v" id="aTarget">—</span></div>
+      <div class="kv"><span class="k">Move expected in</span><span class="v" id="aWhen">—</span></div>
+      <div class="kv"><span class="k">Typical hold</span><span class="v" id="aHold">—</span></div>
+    </div>
+
+    <!-- HONEST -->
+    <div class="chan hon">
+      <div class="htag"><span>◇ Honest</span><span class="ln"></span><span style="font-size:10px;letter-spacing:.1em;color:var(--cool)">the real odds</span></div>
+      <div class="kv"><span class="k">Direction reliability</span><span class="v mono" id="hDir">—</span></div>
+      <div class="big-honest mono" id="hDirBig">—</div>
+      <div class="kv"><span class="k">Reachability (±target / window)</span><span class="v mono" id="hReach">—</span></div>
+      <div class="kv"><span class="k">Gross edge (best case)</span><span class="v mono">≈ +4.6 bps/trade</span></div>
+      <div class="kv"><span class="k">Round-trip cost</span><span class="v mono">12 bps taker · 6 maker</span></div>
+      <div class="kv"><span class="k">Net after fees</span><span class="v mono" id="hNet">≈ −7 bps taker · −1 maker</span></div>
+      <div class="verdict" id="hVerdict">—</div>
+    </div>
+
+    <!-- reachability by regime -->
+    <div class="t3">
+      <div class="hd">Time to a ±<span id="tgtLbl">1.0%</span> move · by regime (out-of-sample)</div>
+      <div id="t3body"></div>
+      <div class="seg" id="seg">
+        <button data-t="100" class="on">±1.0%</button>
+        <button data-t="150">±1.5%</button>
+        <button data-t="200">±2.0%</button>
+      </div>
+    </div>
+
+    <!-- trigger memory -->
+    <div class="log">
+      <div class="hd"><span>Trigger memory (MYT)</span><span id="logClear" style="color:var(--cool2)">clear</span></div>
+      <div id="logBody"><div class="row c-t"><span class="t mono">--:--</span>waiting for first closed bar…</div></div>
+    </div>
+  </div>
+
+  <div class="warmup" id="warmup">Warming up the engine… loading history &amp; opening live feed.<br><span style="color:var(--dim);font-size:11.5px">Needs ~5 hours of bars to calibrate the 240-minute baseline.</span></div>
+
+  <div class="foot">
+    <b>JESUS-live-v1</b> · engine ported from a 37-month out-of-sample study (1.6M bars). Onset model OOS AUC 0.744; direction OOS ≈ coin flip; net expectancy after costs ≈ breakeven/negative.
+    Engine math runs on closed Binance 1-minute bars (the series it was trained on); BingX/Binance ticker drives the live price only.
+    iOS suspends background tabs — the feed cannot truly run while the app is backgrounded, but it resyncs the instant you return.
+    Not financial advice. You make every decision.
+  </div>
+</div>
+
+<script>
+/* ===================== CONFIG (exported from recalibration) ===================== */
+const CFG = {
+  windows:{short:20,base:240,dE_lag:5,ret_a:15,ret_b:60,dB_lag:60,recent_actual:30},
+  regime:{q1_bps:15.089426323024961,q2_bps:23.23981704341926},
+  state:{E_low:-0.31640513202558823,E_mid:0.1637651927427468,E_high:0.6939550147191993},
+  onset:{
+    features:["rng_b","rng_s","dB60","E","dE","vol_z","taker_dev","abs_taker","ret15","ret60","sin_tod","cos_tod"],
+    mean:[22.227974151516793,22.229371326920376,-0.0031376282470969574,-0.004888743249049056,-5.2994604414480875e-05,0.01540438654196908,-0.00045795933830177854,0.129243427525954,-0.1722667074437783,-0.70276092459947,-5.148838821466014e-05,-1.9180463391985695e-05],
+    std:[14.179030331496065,17.449016749721917,3.662433558304596,0.5154259518077864,0.1984633362108269,1.1015963423938733,0.1599829474816277,0.09429151421526893,75.74726002610922,144.89969863638868,0.7070913951081325,0.7071221647955115],
+    coef:[0.035424797569719176,-0.24969295669218067,-0.047963936924012185,0.5859946305960433,0.14166012767276207,0.23394244946494705,-0.011895244538600696,-0.061004958108236654,-0.026421866883203343,-0.007973932673369915,-0.09192652264864973,0.10616523658242019],
+    intercept:-1.7961269184722468, horizon_min:30
+  },
+  time_to_target:{
+    "100":{LOW:{reach:0.835,med:79},MED:{reach:0.959,med:45},HIGH:{reach:0.994,med:19}},
+    "150":{LOW:{reach:0.601,med:113},MED:{reach:0.815,med:76},HIGH:{reach:0.947,med:38}},
+    "200":{LOW:{reach:0.421,med:129},MED:{reach:0.653,med:98},HIGH:{reach:0.846,med:58}}
+  },
+  dwell:{ "Actual":9,"Formation":4,"Neutral":6,"Pre-formation":6,"Residual":6 },
+  costs:{taker:12,maker:6,breakeven:4.6,bestGross:4.6}
+};
+let TARGET = "100";  // current target (bps): 100/150/200
+
+/* ===================== ENGINE (ported from validated Python) ===================== */
+function mean(a,i,w){let s=0;for(let k=i-w+1;k<=i;k++)s+=a[k];return s/w;}
+function std(a,i,w,m){let s=0;for(let k=i-w+1;k<=i;k++){const d=a[k]-m;s+=d*d;}return Math.sqrt(s/(w-1));}
+function sigmoid(z){return 1/(1+Math.exp(-z));}
+
+function computeEngine(EB){
+  const n=EB.length, B=CFG.windows.base, S=CFG.windows.short;
+  if(n < B+CFG.windows.dB_lag+5) return null;   // warmup (>=305 bars)
+  const C=EB.map(b=>b.c),H=EB.map(b=>b.h),L=EB.map(b=>b.l),V=EB.map(b=>b.v),TB=EB.map(b=>b.tb);
+  const tr=EB.map(b=>(b.h-b.l)/b.c*1e4);
+  const rngB=i=>mean(tr,i,B), rngS=i=>mean(tr,i,S);
+  const Eat=i=>{const rb=rngB(i),rs=rngS(i),sd=std(tr,i,B,rb);return (rs-rb)/(sd+1e-9);};
+  const i=n-1;
+  const rb=rngB(i),rs=rngS(i),sd=std(tr,i,B,rb),E=(rs-rb)/(sd+1e-9);
+  const dE=E-Eat(i-5);
+  const dB60=rb-rngB(i-CFG.windows.dB_lag);
+  const vM=mean(V,i,B),vS=std(V,i,B,vM),vol_z=(V[i]-vM)/(vS+1e-9);
+  const taker_dev=(V[i]>0?TB[i]/V[i]:0.5)-0.5, abs_taker=Math.abs(taker_dev);
+  const ret15=Math.log(C[i]/C[i-CFG.windows.ret_a])*1e4;
+  const ret60=Math.log(C[i]/C[i-CFG.windows.ret_b])*1e4;
+  const dt=new Date(EB[i].t); const mh=((dt.getUTCHours()+8)%24)+dt.getUTCMinutes()/60;
+  const sin_tod=Math.sin(2*Math.PI*mh/24), cos_tod=Math.cos(2*Math.PI*mh/24);
+  // regime
+  const regime = rb<=CFG.regime.q1_bps?"LOW":(rb<=CFG.regime.q2_bps?"MED":"HIGH");
+  // state
+  const Ehi=CFG.state.E_high,Emid=CFG.state.E_mid,Elo=CFG.state.E_low;
+  const actualNow=E>=Ehi;
+  let recentActual=false;for(let k=Math.max(0,i-29);k<=i;k++){if(Eat(k)>=Ehi){recentActual=true;break;}}
+  let state="Neutral";
+  if(E<=Elo)state="Pre-formation";
+  if(!actualNow&&recentActual&&dE<0)state="Residual";
+  if(E>=Emid&&E<Ehi&&dE>0)state="Formation";
+  if(actualNow)state="Actual";
+  // onset probability
+  const feat={rng_b:rb,rng_s:rs,dB60:dB60,E:E,dE:dE,vol_z:vol_z,taker_dev:taker_dev,abs_taker:abs_taker,ret15:ret15,ret60:ret60,sin_tod:sin_tod,cos_tod:cos_tod};
+  let z=CFG.onset.intercept;
+  CFG.onset.features.forEach((f,idx)=>{z+=CFG.onset.coef[idx]*((feat[f]-CFG.onset.mean[idx])/CFG.onset.std[idx]);});
+  const onset_p=sigmoid(z);
+  // breakout direction (Donchian 30 of prior bars)
+  let hh=-Infinity,ll=Infinity;for(let k=i-30;k<i;k++){if(H[k]>hh)hh=H[k];if(L[k]<ll)ll=L[k];}
+  const brkDir=C[i]>hh?1:(C[i]<ll?-1:0);
+  return {state,regime,E,dE,onset_p,brkDir,close:C[i],barT:EB[i].t,deg:!!EB[i].deg};
+}
+
+/* ===================== POLICIES (aggressive vs honest, both from real numbers) ===================== */
+function aggressivePolicy(s){
+  // honest aggression: fire readily in MED/HIGH, but STAND DOWN in LOW (where data says you bleed most)
+  if(s.regime==="LOW") return {act:"STAND DOWN",cls:"stand",arrow:"■",why:"dead tape (LOW regime loses most)"};
+  const ready = (s.state==="Formation"||s.state==="Actual"||s.onset_p>=0.20);
+  if(s.brkDir!==0 && ready){
+    return s.brkDir>0
+      ? {act:"LONG",cls:"long",arrow:"▲",why:"upside breakout · "+s.state}
+      : {act:"SHORT",cls:"short",arrow:"▼",why:"downside breakout · "+s.state};
+  }
+  return {act:"WAIT — armed",cls:"wait",arrow:"…",why:"ripe, awaiting breakout trigger"};
+}
+function honestRead(s){
+  const acc = (s.regime==="HIGH"&&s.onset_p>=0.30) ? 0.55 : (s.regime!=="LOW"?0.51:0.50);
+  const dirTxt = acc>=0.54 ? "≈55% — faint edge (best window)" :
+                 acc>=0.505? "≈51% — barely above coin flip" : "≈50% — coin flip";
+  const tt = CFG.time_to_target[TARGET][s.regime];
+  const reach = Math.round(tt.reach*100)+"% in ~"+tt.med+"m";
+  let verdict, vcls;
+  if(s.regime==="LOW"){ verdict="STAND DOWN — dead tape, worst expectancy"; vcls="v-stand"; }
+  else { verdict="No positive expectancy after fees — discretionary only"; vcls="v-bad"; }
+  return {acc,dirTxt,reach,verdict,vcls};
+}
+
+/* ===================== UI ===================== */
+const $=id=>document.getElementById(id);
+function fmtPx(p){return (+p).toFixed(7);}
+let lastTick=0, lastState=null, started=false;
+
+function renderTick(px,hi,lo){
+  $("px").textContent=fmtPx(px);
+  const t=$("tick");
+  if(lastTick){ if(px>lastTick){t.textContent="▲";t.className="tick mono up";}
+    else if(px<lastTick){t.textContent="▼";t.className="tick mono dn";} }
+  lastTick=px;
+  if(hi&&lo&&hi>lo){
+    $("hi24").textContent="24h H "+fmtPx(hi); $("lo24").textContent="24h L "+fmtPx(lo);
+    const pos=Math.max(0,Math.min(1,(px-lo)/(hi-lo)));
+    $("pin").style.left=(pos*100).toFixed(1)+"%";
+  }
+}
+function regimeColor(r){return r==="LOW"?"var(--lowc)":r==="MED"?"var(--medc)":"var(--highc)";}
+function stateColor(st){return st==="Actual"?"var(--up)":st==="Formation"?"var(--hot2)":
+  st==="Residual"?"var(--cool2)":st==="Pre-formation"?"var(--mut)":"var(--dim)";}
+
+function renderEngine(s){
+  if(!s){return;}
+  $("warmup").style.display="none"; $("live").style.display="block";
+  // 1h change
+  // weather
+  const rp=$("regime"); rp.textContent=s.regime; rp.style.background="color-mix(in srgb,"+regimeColor(s.regime)+" 22%, transparent)"; rp.style.color=regimeColor(s.regime);
+  $("regimeNote").textContent = s.regime==="LOW"?"quiet — moves rare/slow":s.regime==="MED"?"normal activity":"hot — moves fast & large";
+  const sp=$("state"); sp.textContent=s.state; sp.style.background="color-mix(in srgb,"+stateColor(s.state)+" 20%, transparent)"; sp.style.color=stateColor(s.state);
+  const sNote={"Pre-formation":"compressed (expansion not imminent)","Formation":"ramp building","Actual":"move in progress","Residual":"after-move decay","Neutral":"no clear phase"};
+  $("stateNote").textContent=sNote[s.state]||"";
+  const op=Math.round(s.onset_p*100);
+  $("onsetPct").textContent=op+"%"+(s.deg?'<span class="flag">flow est.</span>':'');
+  $("onsetPct").innerHTML=op+"%"+(s.deg?' <span class="flag">flow estimated</span>':'');
+  $("onsetG").style.width=Math.min(100,op)+"%";
+
+  // AGGRESSIVE
+  const a=aggressivePolicy(s);
+  $("aArrow").textContent=a.arrow; $("aArrow").className="arrow "+a.cls;
+  $("aText").textContent=a.act; $("aText").className=a.cls;
+  $("aWhy").textContent=a.why;
+  const tt=CFG.time_to_target[TARGET][s.regime];
+  const tgtPct=(parseInt(TARGET)/100).toFixed(1)+"%";
+  const tgtPts=Math.round(parseInt(TARGET)/1e4 * s.close * 1e7); // points-equiv at current price
+  if(a.act==="STAND DOWN"){
+    $("aTarget").textContent="—"; $("aWhen").textContent="—"; $("aHold").textContent="—";
+  }else{
+    $("aTarget").textContent="±"+tgtPct+" (≈"+tgtPts+" pts now)";
+    $("aWhen").textContent="~"+tt.med+" min ("+Math.round(tt.reach*100)+"% hit)";
+    $("aHold").textContent="~"+(CFG.dwell[s.state]||6)+" min (state median)";
+  }
+
+  // HONEST
+  const h=honestRead(s);
+  $("hDir").textContent=(h.acc*100).toFixed(0)+"%";
+  $("hDirBig").textContent=h.dirTxt;
+  $("hReach").textContent=h.reach;
+  $("hNet").textContent="≈ "+(CFG.costs.bestGross-CFG.costs.taker).toFixed(0)+" bps taker · "+(CFG.costs.bestGross-CFG.costs.maker).toFixed(0)+" bps maker";
+  const v=$("hVerdict"); v.textContent=h.verdict; v.className="verdict "+h.vcls;
+
+  renderT3(s.regime);
+
+  // trigger memory on state change
+  if(s.state!==lastState){
+    const cls = s.state==="Actual"?"c-g":s.state==="Formation"?"c-h":s.state==="Pre-formation"?"c-t":"c-t";
+    pushLog(cls, s.state.toUpperCase()+" · "+s.regime+" · onset "+op+"%", s.barT);
+    lastState=s.state;
+  }
+}
+function renderT3(cur){
+  const rows=["LOW","MED","HIGH"].map(rg=>{
+    const d=CFG.time_to_target[TARGET][rg];
+    const c=regimeColor(rg);
+    return '<div class="t3row '+(rg===cur?'cur':'')+'"><span class="rg" style="color:'+c+'">'+rg+'</span>'+
+           '<span class="mono">'+Math.round(d.reach*100)+'% hit</span>'+
+           '<span class="mono">~'+d.med+' min</span></div>';
+  }).join("");
+  $("t3body").innerHTML=rows;
+  $("tgtLbl").textContent=(parseInt(TARGET)/100).toFixed(1)+"%";
+}
+
+/* trigger memory (persisted, guarded so it never crashes) */
+const STORE={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},
+             set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+let LOG=STORE.get("jesus_log",[]);
+function mytHM(t){const d=new Date(t??Date.now());let h=(d.getUTCHours()+8)%24,m=d.getUTCMinutes();return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0");}
+function pushLog(cls,msg,t){LOG.unshift({t:t||Date.now(),msg,cls});if(LOG.length>50)LOG.pop();STORE.set("jesus_log",LOG);renderLog();}
+function renderLog(){
+  if(!LOG.length){$("logBody").innerHTML='<div class="row c-t"><span class="t mono">--:--</span>no triggers yet</div>';return;}
+  $("logBody").innerHTML=LOG.map(e=>'<div class="row"><span class="t mono">'+mytHM(e.t)+'</span><span class="'+e.cls+'">'+e.msg+'</span></div>').join("");
+}
+renderLog();
+
+/* clock */
+setInterval(()=>{$("clock").textContent=mytHM()+" MYT";},1000);
+
+/* target selector */
+$("seg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  TARGET=b.dataset.t;[...$("seg").children].forEach(x=>x.classList.toggle("on",x===b));
+  if(window._lastEngine)renderEngine(window._lastEngine);});
+$("logClear").addEventListener("click",()=>{LOG=[];STORE.set("jesus_log",LOG);renderLog();});
+
+/* ===================== LIVE FEED (extracted & adapted from HADES, transport only) ===================== */
+const SYM_B="1000PEPEUSDT",SYM_BWS="1000pepeusdt",SYM_X="1000PEPE-USDT",FAPI="https://fapi.binance.com/fapi/v1";
+let EB=[],EBmap=new Map(),candleMap=new Map(),wsA=null,wsB=null,bxT=0,bnT=0,lastLive=0,fails=0;
+const G={pulse:null,watch:null,beat:null,lastRescue:0};
+const mk=t=>Math.floor(t/60000)*60000;
+function setSrc(s){$("src").textContent=s;}
+function setLive(on){$("dot").className="dot"+(on?" live":"");}
+async function gunzip(ab){if(typeof ab==="string")return ab;
+  try{if(window.DecompressionStream){const st=new Blob([ab]).stream().pipeThrough(new DecompressionStream("gzip"));return new TextDecoder().decode(await new Response(st).arrayBuffer());}}catch(e){}
+  return null;}
+function upCandle(px,t){const k=mk(t);let c=candleMap.get(k);if(!c){c={t:k,o:px,h:px,l:px,c:px};candleMap.set(k,c);}else{c.h=Math.max(c.h,px);c.l=Math.min(c.l,px);c.c=px;}}
+function pushPrice(px,hi,lo){px=parseFloat(px);if(!(px>0))return;lastLive=Date.now();setLive(true);upCandle(px,lastLive);renderTick(px,hi?+hi:null,lo?+lo:null);}
+function upsert(k){const t=mk(+k[0]);const b={t,o:+k[1],h:+k[2],l:+k[3],c:+k[4],v:+k[5],n:+k[8],tb:+k[9],deg:false};
+  if(EBmap.has(t)){Object.assign(EBmap.get(t),b);return false;}EBmap.set(t,b);EB.push(b);EB.sort((a,b)=>a.t-b.t);
+  while(EB.length>1000){const o=EB.shift();EBmap.delete(o.t);}return true;}
+function runEngine(){const s=computeEngine(EB);if(s){window._lastEngine=s;renderEngine(s);}}
+async function bootstrap(){try{const r=await fetch(FAPI+"/klines?symbol="+SYM_B+"&interval=1m&limit=1000");const d=await r.json();
+  if(Array.isArray(d)){const cut=mk(Date.now());for(const k of d)if(mk(+k[0])<cut)upsert(k);runEngine();
+    if(EB.length){$("px").textContent=fmtPx(EB[EB.length-1].c);}}}catch(e){}}
+async function pullClosed(){const want=mk(Date.now())-60000;if(EB.length&&EB[EB.length-1].t>=want)return;
+  try{const r=await fetch(FAPI+"/klines?symbol="+SYM_B+"&interval=1m&limit=5",{cache:"no-store"});const d=await r.json();if(!Array.isArray(d))throw 0;
+    const cut=mk(Date.now());let add=false;for(const k of d)if(mk(+k[0])<cut){if(upsert(k))add=true;}fails=0;if(add)runEngine();
+  }catch(e){fails++;if(fails>=2){const c=candleMap.get(want);if(c&&!EBmap.has(want)){const b={t:want,o:c.o,h:c.h,l:c.l,c:c.c,v:0,n:0,tb:0,deg:true};EBmap.set(want,b);EB.push(b);EB.sort((a,b)=>a.t-b.t);runEngine();}}}}
+function closeSockets(){try{if(G.beat)clearInterval(G.beat)}catch(e){}try{if(wsA){wsA.onclose=null;wsA.close()}}catch(e){}try{if(wsB){wsB.onclose=null;wsB.close()}}catch(e){}wsA=wsB=null;}
+function beat(ws,lab){try{if(G.beat)clearInterval(G.beat)}catch(e){}G.beat=setInterval(()=>{const age=Date.now()-(lastLive||0);
+  if(ws&&ws.readyState===1&&lab==="X"){try{ws.send("Ping")}catch(e){}}if(age>18000){rescue()}},6000);}
+async function restPulse(){try{const r=await fetch(FAPI+"/ticker/24hr?symbol="+SYM_B,{cache:"no-store"});const m=await r.json();
+  const c=m.lastPrice||m.close,h=m.highPrice,l=m.lowPrice;if(c){setSrc("Binance REST");pushPrice(c,h,l);return true;}}catch(e){}return false;}
+function startPulse(){if(G.pulse)clearInterval(G.pulse);G.pulse=setInterval(()=>{const age=Date.now()-(lastLive||0);if(!lastLive||age>12000||!wsA||wsA.readyState!==1)restPulse();},12000);}
+function rescue(){const now=Date.now();if(now-G.lastRescue<5000)return;G.lastRescue=now;restPulse();bxT=0;bnT=0;closeSockets();setTimeout(connectX,600);}
+function startWatch(){if(G.watch)clearInterval(G.watch);G.watch=setInterval(()=>{const age=Date.now()-(lastLive||0);if(!lastLive)return;if(age>15000)restPulse();if(age>30000)rescue();if(age>6000)setLive(false);},4000);}
+function connectN(){if(bnT>=8){setSrc("feeds blocked");return;}bnT++;let ws;try{ws=new WebSocket("wss://fstream.binance.com/ws/"+SYM_BWS+"@ticker");wsB=ws;}catch(e){return;}
+  setSrc("Binance…");const to=setTimeout(()=>{try{ws.close()}catch(e){}},9000);
+  ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return;}if(m&&m.c){clearTimeout(to);setSrc("Binance");pushPrice(m.c,m.h,m.l);}};
+  ws.onclose=()=>{clearTimeout(to);if(Date.now()-lastLive>10000)setTimeout(connectN,1800);};ws.onerror=()=>{try{ws.close()}catch(e){}};}
+function connectX(){if(bxT>=4){connectN();return;}bxT++;let ws;try{ws=new WebSocket("wss://open-api-swap.bingx.com/swap-market");wsA=ws;ws.binaryType="arraybuffer";}catch(e){connectN();return;}
+  setSrc("BingX…");const to=setTimeout(()=>{try{ws.close()}catch(e){}},9000);
+  ws.onopen=()=>{beat(ws,"X");try{ws.send(JSON.stringify({id:"jesus-"+Date.now(),reqType:"sub",dataType:SYM_X+"@ticker"}))}catch(e){}};
+  ws.onmessage=async ev=>{const txt=await gunzip(ev.data);if(txt===null)return;if(txt==="Ping"){try{ws.send("Pong")}catch(e){}return;}
+    let m;try{m=JSON.parse(txt)}catch(e){return;}if(m&&m.ping){try{ws.send(JSON.stringify({pong:m.ping}))}catch(e){}return;}
+    if(m&&m.data){const d=m.data,c=d.c||d.lastPrice||d.close||d.p,h=d.h||d.highPrice,l=d.l||d.lowPrice;if(c){clearTimeout(to);setSrc("BingX");pushPrice(c,h,l);}}};
+  ws.onclose=()=>{clearTimeout(to);if(Date.now()-lastLive>10000)setTimeout(connectX,1600);};ws.onerror=()=>{try{ws.close()}catch(e){}};}
+function sync(){bxT=0;bnT=0;lastLive=0;closeSockets();bootstrap().finally(()=>{connectX();startPulse();startWatch();});}
+function wake(){const age=Date.now()-(lastLive||0);if(age>8000||!wsA||wsA.readyState!==1){restPulse();bxT=0;bnT=0;closeSockets();setTimeout(connectX,300);}pullClosed();}
+sync();
+setInterval(pullClosed,5000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)wake();});
+window.addEventListener("focus",wake);
+window.addEventListener("pageshow",e=>{if(e.persisted)wake();});
+window.addEventListener("online",wake);
+window.addEventListener("offline",()=>setSrc("offline"));
+</script>
+</body>
+</html>
